@@ -59,6 +59,14 @@ abstract class ListTestCase extends WithDatabaseTestCase
     ];
 
     /**
+     * @return array
+     */
+    public static function getListData(): array
+    {
+        return self::$listData;
+    }
+
+    /**
      * Call MailChimp to delete lists created during test.
      *
      * @return void
