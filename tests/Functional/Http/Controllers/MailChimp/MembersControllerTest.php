@@ -75,4 +75,34 @@ class MembersControllerTest extends MemberTestCase
         $this->assertResponseOk();
         self::assertEmpty(\json_decode($this->response->content(), true));
     }
+
+    public function testShowMemberNotFoundException(): void
+    {
+        $this->get("/mailchimp/lists/{$this->listId}/members/invalid-member-id");
+
+        $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+
+    /**
+     * Test application returns successful response with list data when requesting existing list.
+     *
+     * @return void
+     */
+    public function testShowListSuccessfully(): void
+    {
+        $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
+
+        $member = \json_decode($this->response->content(), true);
+
+        $this->get("/mailchimp/lists/{$this->listId}/members/{$member['member_id']}");
+        $content = \json_decode($this->response->content(), true);
+
+        $this->assertResponseOk();
+
+        foreach (static::$memberData as $key => $value) {
+            self::assertArrayHasKey($key, $content);
+            self::assertEquals($value, $content[$key]);
+        }
+    }
 }

@@ -108,4 +108,31 @@ class MembersController extends Controller
 
         return $this->successfulResponse([]);
     }
+
+
+    /**
+     * Retrieve and return MailChimp list.
+     *
+     * @param string $listId
+     * @param string $memberId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(string $listId, string $memberId): JsonResponse
+    {
+        /** @var \App\Database\Entities\MailChimp\MailChimpMember|null $member */
+        $member = $this->entityManager->getRepository(MailChimpMember::class)->findOneBy([
+            //'listId' => $listId,
+            'memberId' => $memberId,
+            'list' => $listId,
+        ]);
+
+        if ($member === null) {
+            return $this->errorResponse(
+                ['message' => \sprintf('MailChimpMember[%s] not found', $memberId)],
+                404
+            );
+        }
+
+        return $this->successfulResponse($member->toArray());
+    }
 }
