@@ -15,15 +15,13 @@ class MembersControllerTest extends MemberTestCase
     public function testCreateMemberInListSuccessfully(): void
     {
         $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
-
-        $content = \json_decode($this->response->getContent(), true);
+        $member = \json_decode($this->response->getContent(), true);
+        $this->createdMailChimpMemberIds[] = $member['mail_chimp_id'];
 
         $this->assertResponseOk();
         $this->seeJson(static::$memberData);
-        $this->assertArrayHasKey('mail_chimp_id', $content);
-        $this->assertNotNull($content['mail_chimp_id']);
-
-        $this->createdMailChimpMemberIds[] = $content['mail_chimp_id'];
+        $this->assertArrayHasKey('mail_chimp_id', $member);
+        $this->assertNotNull($member['mail_chimp_id']);
     }
 
     public function testCreateMemberValidationFailed(): void
@@ -67,7 +65,6 @@ class MembersControllerTest extends MemberTestCase
     public function testRemoveMemberSuccessfully(): void
     {
         $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
-
         $member = \json_decode($this->response->content(), true);
 
         $this->delete("/mailchimp/lists/{$this->listId}/members/{$member['member_id']}");
@@ -83,17 +80,16 @@ class MembersControllerTest extends MemberTestCase
         $this->assertMemberNotFoundResponse('invalid-member-id');
     }
 
-
     /**
      * Test application returns successful response with list data when requesting existing list.
      *
      * @return void
      */
-    public function testShowListSuccessfully(): void
+    public function testShowMemberSuccessfully(): void
     {
         $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
-
         $member = \json_decode($this->response->content(), true);
+        $this->createdMailChimpMemberIds[] = $member['mail_chimp_id'];
 
         $this->get("/mailchimp/lists/{$this->listId}/members/{$member['member_id']}");
         $content = \json_decode($this->response->content(), true);
@@ -104,5 +100,46 @@ class MembersControllerTest extends MemberTestCase
             self::assertArrayHasKey($key, $content);
             self::assertEquals($value, $content[$key]);
         }
+    }
+
+    public function testUpdateMemberNotFoundException(): void
+    {
+        $this->put("/mailchimp/lists/{$this->listId}/members/invalid-member-id");
+
+        $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+    public function testUpdateMemberSuccessfully(): void
+    {
+        $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
+        $member = \json_decode($this->response->content(), true);
+        $this->createdMailChimpMemberIds[] = $member['mail_chimp_id'];
+
+        $this->put("/mailchimp/lists/{$this->listId}/members/{$member['member_id']}", ['email_type' => 'text']);
+        $content = \json_decode($this->response->content(), true);
+
+        $this->assertResponseOk();
+
+        foreach (\array_keys(static::$memberData) as $key) {
+            self::assertArrayHasKey($key, $content);
+            self::assertEquals('text', $content['email_type']);
+        }
+    }
+
+    public function testUpdateMemberValidationFailed(): void
+    {
+        $this->post("/mailchimp/lists/{$this->listId}/members", static::$memberData);
+        $member = \json_decode($this->response->content(), true);
+        $this->createdMailChimpMemberIds[] = $member['mail_chimp_id'];
+
+        $this->put("/mailchimp/lists/{$this->listId}/members/{$member['member_id']}", ['email_type' => 'invalid']);
+
+        $content = \json_decode($this->response->content(), true);
+
+        $this->assertResponseStatus(400);
+        self::assertArrayHasKey('message', $content);
+        self::assertArrayHasKey('errors', $content);
+        self::assertArrayHasKey('email_type', $content['errors']);
+        self::assertEquals('Invalid data given', $content['message']);
     }
 }
