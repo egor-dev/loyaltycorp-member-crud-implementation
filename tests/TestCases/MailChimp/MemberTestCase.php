@@ -65,10 +65,24 @@ class MemberTestCase extends WithDatabaseTestCase
     public static function initMemberData(): void
     {
         $faker = Factory::create();
+        $ip = $faker->ipv4;
+        $datetime = date('Y-m-d H:i:s');
 
         self::$memberData = [
             'email_address' => $faker->email,
+            'email_type' => 'html',
             'status' => 'subscribed',
+            'language' => 'ru',
+            'vip' => false,
+            'location' => [
+                'latitude' => $faker->latitude,
+                'longitude' => $faker->longitude,
+            ],
+            'ip_signup' => $ip,
+            'timestamp_signup' => $datetime,
+            'ip_opt' => $ip,
+            'timestamp_opt' => $datetime,
+            'tags' => [$faker->word, $faker->word],
         ];
     }
 }
