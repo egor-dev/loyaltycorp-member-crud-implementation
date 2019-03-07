@@ -37,6 +37,13 @@ class MailChimpMember extends MailChimpEntity
     private $mailChimpId;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Database\Entities\MailChimp\MailChimpList", inversedBy="members")
+     *
+     * @var MailChimpList
+     */
+    private $list;
+
+    /**
      * @ORM\Column(name="name", type="string")
      *
      * @var string
@@ -131,7 +138,7 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
-     * Set mailchimp id of the list.
+     * Set mailchimp id of the member.
      *
      * @param string $mailChimpId
      *
@@ -320,6 +327,33 @@ class MailChimpMember extends MailChimpEntity
     public function setMarketingPermissions(array $marketingPermissions): MailChimpMember
     {
         $this->marketingPermissions = $marketingPermissions;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailChimpId(): string
+    {
+        return $this->mailChimpId;
+    }
+
+    /**
+     * @return MailChimpList
+     */
+    public function getList(): MailChimpList
+    {
+        return $this->list;
+    }
+
+    /**
+     * @param mixed $list
+     * @return MailChimpMember
+     */
+    public function assignToList(MailChimpList $list): MailChimpMember
+    {
+        $this->list = $list;
 
         return $this;
     }

@@ -12,12 +12,17 @@ class MemberTestCase extends WithDatabaseTestCase
     /**
      * @var array
      */
-    protected $createdMemberIds = [];
+    protected $createdMailChimpMemberIds = [];
 
     /**
      * @var array
      */
     protected static $memberData;
+
+    /**
+     * @var string
+     */
+    protected $mailChimpListId;
 
     /**
      * @var string
@@ -35,7 +40,8 @@ class MemberTestCase extends WithDatabaseTestCase
 
         $content = \json_decode($this->response->getContent(), true);
 
-        $this->listId = $content['mail_chimp_id'];
+        $this->mailChimpListId = $content['mail_chimp_id'];
+        $this->listId = $content['list_id'];
     }
 
     /**
@@ -49,12 +55,12 @@ class MemberTestCase extends WithDatabaseTestCase
         $mailChimp = $this->app->make(Mailchimp::class);
 
         // remove test members from list
-        foreach ($this->createdMemberIds as $memberHash) {
-            $mailChimp->delete("lists/{$this->listId}/members/$memberHash");
+        foreach ($this->createdMailChimpMemberIds as $memberHash) {
+            $mailChimp->delete("lists/{$this->mailChimpListId}/members/$memberHash");
         }
 
         // remove list
-        $mailChimp->delete("lists/{$this->listId}");
+        $mailChimp->delete("lists/{$this->mailChimpListId}");
 
         parent::tearDown();
     }
@@ -84,5 +90,39 @@ class MemberTestCase extends WithDatabaseTestCase
             'timestamp_opt' => $datetime,
             'tags' => [$faker->word, $faker->word],
         ];
+    }
+
+    /**
+     * @var array
+     */
+    protected static $notRequired = [
+        'email_type',
+        'merge_fields',
+        'interests',
+        'language',
+        'vip',
+        'location',
+        'marketing_permissions',
+        'ip_signup',
+        'timestamp_signup',
+        'ip_opt',
+        'timestamp_opt',
+        'tags',
+    ];
+
+    /**
+     * Asserts error response when member not found.
+     *
+     * @param string $memberId
+     *
+     * @return void
+     */
+    protected function assertMemberNotFoundResponse(string $memberId): void
+    {
+        $content = \json_decode($this->response->content(), true);
+
+        $this->assertResponseStatus(404);
+        self::assertArrayHasKey('message', $content);
+        self::assertEquals(\sprintf('MailChimpMember[%s] not found', $memberId), $content['message']);
     }
 }
