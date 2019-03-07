@@ -3,12 +3,19 @@ declare(strict_types=1);
 
 namespace Tests\App\TestCases\MailChimp;
 
+use App\Database\Entities\MailChimp\MailChimpList;
+use App\Database\Entities\MailChimp\MailChimpMember;
 use Faker\Factory;
+use Illuminate\Http\JsonResponse;
 use Mailchimp\Mailchimp;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\App\TestCases\WithDatabaseTestCase;
 
 class MemberTestCase extends WithDatabaseTestCase
 {
+    protected const MAILCHIMP_EXCEPTION_MESSAGE = 'MailChimp exception';
+
     /**
      * @var array
      */
@@ -124,5 +131,66 @@ class MemberTestCase extends WithDatabaseTestCase
         $this->assertResponseStatus(404);
         self::assertArrayHasKey('message', $content);
         self::assertEquals(\sprintf('MailChimpMember[%s] not found', $memberId), $content['message']);
+    }
+
+    /**
+     * Returns mock of MailChimp to trow exception when requesting their API.
+     *
+     * @param string $method
+     *
+     * @return \Mockery\MockInterface
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess) Mockery requires static access to mock()
+     */
+    protected function mockMailChimpForException(string $method): MockInterface
+    {
+        $mailChimp = Mockery::mock(Mailchimp::class);
+
+        $mailChimp
+            ->shouldReceive($method)
+            ->once()
+            ->withArgs(function (string $method, ?array $options = null) {
+                return !empty($method) && (null === $options || \is_array($options));
+            })
+            ->andThrow(new \Exception(self::MAILCHIMP_EXCEPTION_MESSAGE));
+
+        return $mailChimp;
+    }
+
+    /**
+     * Asserts error response when MailChimp exception is thrown.
+     *
+     * @param \Illuminate\Http\JsonResponse $response
+     *
+     * @return void
+     */
+    protected function assertMailChimpExceptionResponse(JsonResponse $response): void
+    {
+        $content = \json_decode($response->content(), true);
+
+        self::assertEquals(400, $response->getStatusCode());
+        self::assertArrayHasKey('message', $content);
+        self::assertEquals(self::MAILCHIMP_EXCEPTION_MESSAGE, $content['message']);
+    }
+
+    protected function createList(array $data): MailChimpList
+    {
+        $list = new MailChimpList($data);
+
+        $this->entityManager->persist($list);
+        $this->entityManager->flush();
+
+        return $list;
+    }
+
+    protected function createMember(MailChimpList $list, array $data): MailChimpMember
+    {
+        $member = new MailChimpMember($data);
+        $member->assignToList($list);
+
+        $this->entityManager->persist($member);
+        $this->entityManager->flush();
+
+        return $member;
     }
 }
