@@ -49,7 +49,11 @@ class MailChimpList extends MailChimpEntity
      */
     private $mailChimpId;
 
-    /** @ORM\OneToMany(targetEntity="App\Database\Entities\MailChimp\MailChimpMember", mappedBy="list") */
+    /**
+     * @ORM\OneToMany(targetEntity="App\Database\Entities\MailChimp\MailChimpMember", mappedBy="list")
+     *
+     * @var array
+     */
     private $members;
 
     /**

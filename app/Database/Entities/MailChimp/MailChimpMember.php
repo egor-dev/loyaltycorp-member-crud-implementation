@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Database\Entities\MailChimp;
 
-use Doctrine\ORM\Mapping as ORM;
 use EoneoPay\Utils\Str;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
@@ -44,7 +44,7 @@ class MailChimpMember extends MailChimpEntity
     private $list;
 
     /**
-     * @ORM\Column(name="name", type="string")
+     * @ORM\Column(name="email_address", type="string")
      *
      * @var string
      */
@@ -138,6 +138,16 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Get mailchimp id of the member.
+     *
+     * @return string
+     */
+    public function getMailChimpId(): ?string
+    {
+        return $this->mailChimpId;
+    }
+
+    /**
      * Set mailchimp id of the member.
      *
      * @param string $mailChimpId
@@ -152,7 +162,10 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Set email address.
+     *
      * @param string $emailAddress
+     *
      * @return MailChimpMember
      */
     public function setEmailAddress(string $emailAddress): MailChimpMember
@@ -163,7 +176,10 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Set status.
+     *
      * @param $status
+     *
      * @return MailChimpMember
      */
     public function setStatus($status): MailChimpMember
@@ -174,7 +190,10 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Set location.
+     *
      * @param array $location
+     *
      * @return MailChimpMember
      */
     public function setLocation(array $location): MailChimpMember
@@ -185,12 +204,151 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
+     * Set email type.
+     *
      * @param string $emailType
+     *
      * @return MailChimpMember
      */
     public function setEmailType(string $emailType): MailChimpMember
     {
         $this->emailType = $emailType;
+
+        return $this;
+    }
+
+    /**
+     * Set language.
+     *
+     * @param mixed $language
+     *
+     * @return MailChimpMember
+     */
+    public function setLanguage($language): MailChimpMember
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * Set VIP status.
+     *
+     * @param bool $vip
+     *
+     * @return MailChimpMember
+     */
+    public function setVip(bool $vip): MailChimpMember
+    {
+        $this->vip = $vip;
+
+        return $this;
+    }
+
+    /**
+     * Set IP on sign up.
+     *
+     * @param string $ipSignup
+     *
+     * @return MailChimpMember
+     */
+    public function setIpSignup(string $ipSignup): MailChimpMember
+    {
+        $this->ipSignup = $ipSignup;
+
+        return $this;
+    }
+
+    /**
+     * Set timestamp of sign up.
+     *
+     * @param string $timestampSignup
+     *
+     * @return MailChimpMember
+     */
+    public function setTimestampSignup(string $timestampSignup): MailChimpMember
+    {
+        $this->timestampSignup = $timestampSignup;
+
+        return $this;
+    }
+
+    /**
+     * Set IP of opt-in.
+     *
+     * @param string $ipOpt
+     *
+     * @return MailChimpMember
+     */
+    public function setIpOpt(string $ipOpt): MailChimpMember
+    {
+        $this->ipOpt = $ipOpt;
+
+        return $this;
+    }
+
+    /**
+     * Set timestamp of opt-in.
+     *
+     * @param string $timestampOpt
+     *
+     * @return MailChimpMember
+     */
+    public function setTimestampOpt(string $timestampOpt): MailChimpMember
+    {
+        $this->timestampOpt = $timestampOpt;
+
+        return $this;
+    }
+
+    /**
+     * Set tags.
+     *
+     * @param array $tags
+     *
+     * @return MailChimpMember
+     */
+    public function setTags(array $tags): MailChimpMember
+    {
+        $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Set marketing permissions.
+     *
+     * @param array $marketingPermissions
+     *
+     * @return MailChimpMember
+     */
+    public function setMarketingPermissions(array $marketingPermissions): MailChimpMember
+    {
+        $this->marketingPermissions = $marketingPermissions;
+
+        return $this;
+    }
+
+    /**
+     * Get list.
+     *
+     * @return MailChimpList
+     */
+    public function getList(): MailChimpList
+    {
+        return $this->list;
+    }
+
+    /**
+     * Assign member to list.
+     *
+     * @param MailChimpList $list
+     *
+     * @return MailChimpMember
+     */
+    public function assignToList(MailChimpList $list): MailChimpMember
+    {
+        $this->list = $list;
 
         return $this;
     }
@@ -205,7 +363,7 @@ class MailChimpMember extends MailChimpEntity
         return [
             'email_address' => 'required|email',
             'email_type' => 'nullable|string|in:html,text',
-            'status' => 'required|string|in:'.implode(',', self::STATUS_ALLOWED),
+            'status' => 'required|string|in:' . implode(',', self::STATUS_ALLOWED),
             'merge_fields' => 'nullable|array',
             'interests' => 'nullable|array',
             'language' => 'nullable|string|size:2',
@@ -241,120 +399,5 @@ class MailChimpMember extends MailChimpEntity
         }
 
         return $array;
-    }
-
-    /**
-     * @param mixed $language
-     * @return MailChimpMember
-     */
-    public function setLanguage($language): MailChimpMember
-    {
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $vip
-     * @return MailChimpMember
-     */
-    public function setVip(bool $vip): MailChimpMember
-    {
-        $this->vip = $vip;
-
-        return $this;
-    }
-
-    /**
-     * @param string $ipSignup
-     * @return MailChimpMember
-     */
-    public function setIpSignup(string $ipSignup): MailChimpMember
-    {
-        $this->ipSignup = $ipSignup;
-
-        return $this;
-    }
-
-    /**
-     * @param string $timestampSignup
-     * @return MailChimpMember
-     */
-    public function setTimestampSignup(string $timestampSignup): MailChimpMember
-    {
-        $this->timestampSignup = $timestampSignup;
-
-        return $this;
-    }
-
-    /**
-     * @param string $ipOpt
-     * @return MailChimpMember
-     */
-    public function setIpOpt(string $ipOpt): MailChimpMember
-    {
-        $this->ipOpt = $ipOpt;
-
-        return $this;
-    }
-
-    /**
-     * @param string $timestampOpt
-     * @return MailChimpMember
-     */
-    public function setTimestampOpt(string $timestampOpt): MailChimpMember
-    {
-        $this->timestampOpt = $timestampOpt;
-
-        return $this;
-    }
-
-    /**
-     * @param array $tags
-     * @return MailChimpMember
-     */
-    public function setTags(array $tags): MailChimpMember
-    {
-        $this->tags = $tags;
-
-        return $this;
-    }
-
-    /**
-     * @param array $marketingPermissions
-     * @return MailChimpMember
-     */
-    public function setMarketingPermissions(array $marketingPermissions): MailChimpMember
-    {
-        $this->marketingPermissions = $marketingPermissions;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailChimpId(): ?string
-    {
-        return $this->mailChimpId;
-    }
-
-    /**
-     * @return MailChimpList
-     */
-    public function getList(): MailChimpList
-    {
-        return $this->list;
-    }
-
-    /**
-     * @param mixed $list
-     * @return MailChimpMember
-     */
-    public function assignToList(MailChimpList $list): MailChimpMember
-    {
-        $this->list = $list;
-
-        return $this;
     }
 }

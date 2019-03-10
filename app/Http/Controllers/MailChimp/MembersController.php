@@ -3,17 +3,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\MailChimp;
 
-use App\Database\Entities\MailChimp\MailChimpList;
-use App\Database\Entities\MailChimp\MailChimpMember;
+use Exception;
+use Mailchimp\Mailchimp;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Mailchimp\Mailchimp;
+use App\Database\Entities\MailChimp\MailChimpList;
+use App\Database\Entities\MailChimp\MailChimpMember;
 
 /**
- * Class MembersController
+ * Class MembersController.
+ *
  * @package App\Http\Controllers\MailChimp
  */
 class MembersController extends Controller
@@ -39,6 +40,7 @@ class MembersController extends Controller
     /**
      * @param Request $request
      * @param $listId
+     *
      * @return JsonResponse
      */
     public function create(Request $request, $listId): JsonResponse
@@ -50,7 +52,7 @@ class MembersController extends Controller
         if ($validator->fails()) {
             return $this->errorResponse([
                 'message' => 'Invalid data given',
-                'errors' => $validator->errors()->toArray()
+                'errors' => $validator->errors()->toArray(),
             ]);
         }
 
@@ -113,12 +115,12 @@ class MembersController extends Controller
         return $this->successfulResponse([]);
     }
 
-
     /**
      * Retrieve and return MailChimp member.
      *
      * @param string $listId
      * @param string $memberId
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(string $listId, string $memberId): JsonResponse
@@ -138,7 +140,6 @@ class MembersController extends Controller
 
         return $this->successfulResponse($member->toArray());
     }
-
 
     /**
      * Update MailChimp member.
@@ -174,7 +175,7 @@ class MembersController extends Controller
             // Return error response if validation failed
             return $this->errorResponse([
                 'message' => 'Invalid data given',
-                'errors' => $validator->errors()->toArray()
+                'errors' => $validator->errors()->toArray(),
             ]);
         }
 

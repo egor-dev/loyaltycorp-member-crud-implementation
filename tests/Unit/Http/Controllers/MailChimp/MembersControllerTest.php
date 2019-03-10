@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Tests\App\Unit\Http\Controllers\MailChimp;
 
-use App\Http\Controllers\MailChimp\ListsController;
-use App\Http\Controllers\MailChimp\MembersController;
 use Tests\App\TestCases\MailChimp\ListTestCase;
 use Tests\App\TestCases\MailChimp\MemberTestCase;
+use App\Http\Controllers\MailChimp\MembersController;
 
 class MembersControllerTest extends MemberTestCase
 {

@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Tests\App\TestCases\MailChimp;
 
+use Mockery;
+use Faker\Factory;
+use Mailchimp\Mailchimp;
+use Mockery\MockInterface;
+use Illuminate\Http\JsonResponse;
+use Tests\App\TestCases\WithDatabaseTestCase;
 use App\Database\Entities\MailChimp\MailChimpList;
 use App\Database\Entities\MailChimp\MailChimpMember;
-use Faker\Factory;
-use Illuminate\Http\JsonResponse;
-use Mailchimp\Mailchimp;
-use Mockery;
-use Mockery\MockInterface;
-use Tests\App\TestCases\WithDatabaseTestCase;
 
 class MemberTestCase extends WithDatabaseTestCase
 {
@@ -35,6 +35,24 @@ class MemberTestCase extends WithDatabaseTestCase
      * @var string
      */
     protected $listId;
+
+    /**
+     * @var array
+     */
+    protected static $notRequired = [
+        'email_type',
+        'merge_fields',
+        'interests',
+        'language',
+        'vip',
+        'location',
+        'marketing_permissions',
+        'ip_signup',
+        'timestamp_signup',
+        'ip_opt',
+        'timestamp_opt',
+        'tags',
+    ];
 
     public function setUp(): void
     {
@@ -98,24 +116,6 @@ class MemberTestCase extends WithDatabaseTestCase
             'tags' => [$faker->word, $faker->word],
         ];
     }
-
-    /**
-     * @var array
-     */
-    protected static $notRequired = [
-        'email_type',
-        'merge_fields',
-        'interests',
-        'language',
-        'vip',
-        'location',
-        'marketing_permissions',
-        'ip_signup',
-        'timestamp_signup',
-        'ip_opt',
-        'timestamp_opt',
-        'tags',
-    ];
 
     /**
      * Asserts error response when member not found.
