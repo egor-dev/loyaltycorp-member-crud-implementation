@@ -102,9 +102,7 @@ class MembersController extends Controller
         }
 
         try {
-            // Remove list from database
             $this->removeEntity($member);
-            // Remove list from MailChimp
             $listMailChimpId = $member->getList()->getMailChimpId();
             $memberMailChimpId = $member->getMailChimpId();
             $this->mailChimp->delete("lists/$listMailChimpId/members/$memberMailChimpId");
@@ -165,14 +163,10 @@ class MembersController extends Controller
             );
         }
 
-        // Update list properties
         $member->fill($request->all());
-
-        // Validate entity
         $validator = $this->getValidationFactory()->make($member->toMailChimpArray(), $member->getValidationRules());
 
         if ($validator->fails()) {
-            // Return error response if validation failed
             return $this->errorResponse([
                 'message' => 'Invalid data given',
                 'errors' => $validator->errors()->toArray(),
@@ -180,9 +174,7 @@ class MembersController extends Controller
         }
 
         try {
-            // Update list into database
             $this->saveEntity($member);
-            // Update list into MailChimp
             $listMailChimpId = $member->getList()->getMailChimpId();
             $memberMailChimpId = $member->getMailChimpId();
             $this->mailChimp->patch("lists/$listMailChimpId/members/$memberMailChimpId", $member->toMailChimpArray());

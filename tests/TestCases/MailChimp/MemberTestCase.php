@@ -173,6 +173,13 @@ class MemberTestCase extends WithDatabaseTestCase
         self::assertEquals(self::MAILCHIMP_EXCEPTION_MESSAGE, $content['message']);
     }
 
+    /**
+     * Create MailChimp list into database.
+     *
+     * @param array $data
+     *
+     * @return MailChimpList
+     */
     protected function createList(array $data): MailChimpList
     {
         $list = new MailChimpList($data);
@@ -183,6 +190,14 @@ class MemberTestCase extends WithDatabaseTestCase
         return $list;
     }
 
+    /**
+     * Create MailChimp member within list into database.
+     *
+     * @param MailChimpList $list
+     * @param array $data
+     *
+     * @return MailChimpMember
+     */
     protected function createMember(MailChimpList $list, array $data): MailChimpMember
     {
         $member = new MailChimpMember($data);
